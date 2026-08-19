@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Expo / React Native / build
+.expo/
+dist/
+web-build/
+*.tsbuildinfo
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Claude Code (local / máquina)
+.mcp.json
+.claude/settings.local.json
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
