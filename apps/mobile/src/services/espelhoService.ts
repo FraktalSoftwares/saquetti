@@ -95,7 +95,19 @@ function marcParaDetalhe(marc: MarcacaoRow[]): MarcacaoDetalhe[] {
   }));
 }
 
-type MesComputado = { dias: DiaEspelho[]; trabalhadasMin: number; esperadasMin: number };
+type MesComputado = {
+  dias: DiaEspelho[];
+  trabalhadasMin: number;
+  esperadasMin: number;
+  /**
+   * Dias uteis ja decorridos que exigem atencao antes da assinatura: sem nenhuma
+   * marcacao (falta) ou com batidas em aberto (numero impar de marcacoes).
+   * [A DEFINIR] O discovery nao fecha as regras de deteccao de pendencias
+   * (tolerancia de atraso, limites configuraveis); esta contagem cobre o que da
+   * para derivar das marcacoes hoje.
+   */
+  inconsistencias: number;
+};
 
 /** Computa um mês inteiro (dias históricos, sem incluir "hoje"). */
 async function computarMes(ano: number, mesIndex: number): Promise<MesComputado> {
@@ -113,6 +125,7 @@ async function computarMes(ano: number, mesIndex: number): Promise<MesComputado>
   const dias: DiaEspelho[] = [];
   let trabalhadasMin = 0;
   let esperadasMin = 0;
+  let inconsistencias = 0;
 
   for (let day = 1; day <= ultimoDia; day++) {
     const date = new Date(ano, mesIndex, day);
@@ -131,6 +144,7 @@ async function computarMes(ano: number, mesIndex: number): Promise<MesComputado>
 
     if (doDia.length === 0) {
       // Sem registro (falta): conta como -esperado no saldo.
+      inconsistencias++;
       dias.push({
         ...base,
         tipo: 'semRegistro',
@@ -154,6 +168,7 @@ async function computarMes(ano: number, mesIndex: number): Promise<MesComputado>
     let tone: BadgeTone;
     let texto: string;
     if (incompleto) {
+      inconsistencias++;
       tone = 'pendente';
       texto = 'Incompleto';
     } else if (saldo > 0) {
@@ -186,7 +201,7 @@ async function computarMes(ano: number, mesIndex: number): Promise<MesComputado>
   }
 
   dias.reverse(); // mais recentes primeiro
-  return { dias, trabalhadasMin, esperadasMin };
+  return { dias, trabalhadasMin, esperadasMin, inconsistencias };
 }
 
 export async function getEspelho(ano?: number, mesIndex?: number): Promise<EspelhoResumo> {
@@ -275,8 +290,10 @@ export async function getMesesCartao(): Promise<MesCartao[]> {
       periodo: `01 – ${pad(ultimoDiaMes)} ${MESES_LONGOS[mesIndex].slice(0, 3).toLowerCase()}`,
       status: assinado ? 'assinado' : 'pendente',
       trabalhadas: fmtDuracao(atual.trabalhadasMin),
+      esperadas: fmtDuracao(atual.esperadasMin),
       saldo: fmtSaldo(saldoAtual),
       saldoPositivo: saldoAtual >= 0,
+      inconsistencias: atual.inconsistencias,
       alerta: assinado ? undefined : `Assinatura pendente até ${pad(ultimoDiaMes)}/${pad(mesIndex + 1)}/${ano}`,
     },
   ];

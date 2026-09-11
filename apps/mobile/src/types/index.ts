@@ -148,8 +148,11 @@ export type MesCartao = {
   periodo: string; // "01 – 30 jun"
   status: 'pendente' | 'assinado';
   trabalhadas: string;
+  esperadas: string; // carga esperada do periodo ("184h00")
   saldo: string;
   saldoPositivo: boolean;
+  /** Dias uteis do periodo sem registro ou com marcacoes em aberto. */
+  inconsistencias: number;
   alerta?: string;
 };
 

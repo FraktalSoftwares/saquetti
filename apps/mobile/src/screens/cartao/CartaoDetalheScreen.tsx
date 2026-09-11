@@ -85,7 +85,7 @@ export function CartaoDetalheScreen({ navigation, route }: AppStackScreenProps<'
               <View style={styles.resumoWrap}>
                 <ResumoCard
                   trabalhadas={mes.trabalhadas}
-                  esperadas="140h00"
+                  esperadas={mes.esperadas}
                   saldo={mes.saldo}
                   saldoPositivo={mes.saldoPositivo}
                 />
