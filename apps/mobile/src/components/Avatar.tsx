@@ -1,12 +1,15 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, View, StyleSheet } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { avatarLauraXml } from '../assets/svg';
+import { useAuth } from '../context/AuthContext';
+import { urlFotoPerfil } from '../services/authService';
 import { colors } from '../theme';
 
 /**
- * Avatar do colaborador. Hoje usa o asset de demonstração (Laura) importado do design.
- * [A DEFINIR] Trocar por `colaborador.fotoPerfil` quando o upload de foto existir.
+ * Avatar do colaborador logado. Exibe a foto de perfil quando houver
+ * (`colaboradores.foto_perfil`, via URL assinada) e cai no asset de demonstração
+ * enquanto o trabalhador não enviar uma imagem.
  */
 export function Avatar({
   size = 46,
@@ -17,6 +20,24 @@ export function Avatar({
   radius?: number;
   bordered?: boolean;
 }) {
+  const { colaborador } = useAuth();
+  const caminho = colaborador?.fotoPerfil ?? null;
+  const [uri, setUri] = useState<string | null>(null);
+
+  useEffect(() => {
+    let ativo = true;
+    if (!caminho) {
+      setUri(null);
+      return;
+    }
+    urlFotoPerfil(caminho).then((u) => {
+      if (ativo) setUri(u);
+    });
+    return () => {
+      ativo = false;
+    };
+  }, [caminho]);
+
   return (
     <View
       style={[
@@ -25,7 +46,11 @@ export function Avatar({
         bordered && styles.bordered,
       ]}
     >
-      <SvgXml xml={avatarLauraXml} width={size} height={size} />
+      {uri ? (
+        <Image source={{ uri }} style={{ width: size, height: size }} resizeMode="cover" />
+      ) : (
+        <SvgXml xml={avatarLauraXml} width={size} height={size} />
+      )}
     </View>
   );
 }

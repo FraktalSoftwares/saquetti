@@ -15,6 +15,8 @@ export type Colaborador = {
   matricula: string | null;
   cargo: string | null;
   departamento: string | null;
+  /** Caminho do arquivo no bucket privado `avatares` (não é URL pública). */
+  fotoPerfil: string | null;
 };
 
 // ----- Registro de Ponto (3.x) -----

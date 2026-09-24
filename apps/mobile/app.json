@@ -42,6 +42,12 @@
           "cameraPermission": "O Saquetti usa a câmera para a foto de verificação no registro de ponto.",
           "recordAudioAndroidPermission": false
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Saquetti acessa suas fotos para você escolher a imagem do seu perfil."
+        }
       ]
     ],
     "extra": {
