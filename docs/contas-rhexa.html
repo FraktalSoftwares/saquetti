@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Checklist das contas que o cliente precisa abrir para o projeto Saquetti/RHEXA, com custo, prazo e passo a passo.">
+<title>Contas e Serviços RHEXA</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap">
+<style>
+  :root{
+    --ground:#F4F6FA;
+    --surface:#FFFFFF;
+    --surface-2:#EAEEF5;
+    --ink:#0B1220;
+    --ink-2:#3C4859;
+    --ink-3:#6C7A8C;
+    --rule:#D9E0EA;
+    --brand:#3D71B8;
+    --brand-soft:#E7EEF8;
+    --navy:#010A28;
+    --ok:#1B7F51;
+    --ok-soft:#E2F1E9;
+    --warn:#9A5B08;
+    --warn-soft:#FBEEDA;
+    --stop:#B33A2F;
+    --stop-soft:#F9E5E2;
+    --shadow:0 1px 2px rgba(11,18,32,.05),0 10px 28px rgba(11,18,32,.06);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 22px 80px}
+  h1,h2,h3{font-family:Sora,system-ui,sans-serif;margin:0;text-wrap:balance}
+  .mono,code{font-family:"IBM Plex Mono",ui-monospace,monospace}
+
+  .mast{background:var(--navy);border-radius:14px;padding:30px 32px;color:#fff}
+  .brandline{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:#8FB4E4;margin:0 0 12px}
+  .mast h1{font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.02em;line-height:1.08;color:#fff}
+  .mast p{margin:12px 0 0;color:#B9C7DC;max-width:62ch}
+
+  section{margin-top:44px}
+  h2{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink);padding-bottom:10px;border-bottom:2px solid var(--ink);margin-bottom:8px}
+  .lede{color:var(--ink-2);max-width:70ch;margin:12px 0 22px}
+
+  /* regra de ouro */
+  .ouro{background:var(--warn-soft);border:1px solid #E8D3A8;border-left:5px solid var(--warn);
+    border-radius:10px;padding:20px 22px;margin-top:24px}
+  .ouro h3{font-size:17px;font-weight:600;margin-bottom:8px}
+  .ouro p{margin:0 0 10px;color:var(--ink-2);max-width:72ch}
+  .ouro p:last-child{margin-bottom:0}
+  .ouro b{color:var(--ink)}
+
+  /* fases */
+  .fases{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .fase{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px 18px}
+  .fase .quando{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--brand);display:block;margin-bottom:6px}
+  .fase h3{font-size:15px;font-weight:600;margin-bottom:8px}
+  .fase ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:3px}
+  .fase li{font-size:13.5px;color:var(--ink-2)}
+  .fase.urgente{border-left:4px solid var(--stop)}
+  .fase.infra{border-left:4px solid var(--brand)}
+  .fase.lanc{border-left:4px solid var(--ok)}
+
+  /* cards de conta */
+  .conta{background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+    padding:22px 24px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .conta-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:4px}
+  .n{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:Sora,sans-serif;
+    font-size:15px;font-weight:700;flex-shrink:0}
+  .conta-head h3{font-size:19px;font-weight:600;letter-spacing:-.01em;flex:1;min-width:180px}
+  .faltava{background:var(--stop-soft);color:var(--stop);font-family:"IBM Plex Mono",monospace;
+    font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:5px}
+  .pra-que{color:var(--ink-2);margin:0 0 14px;max-width:74ch}
+
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .m{background:var(--surface-2);border-radius:6px;padding:5px 11px;
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-2)}
+  .m b{color:var(--ink);font-weight:500}
+
+  .passos{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+  .passos li{font-size:14px;color:var(--ink-2)}
+  .passos li b{color:var(--ink)}
+  .passos code{background:var(--surface-2);border-radius:4px;padding:1px 6px;font-size:12.5px}
+
+  .atencao{margin-top:14px;background:var(--brand-soft);border-radius:8px;padding:12px 15px;
+    font-size:13.5px;color:var(--ink-2)}
+  .atencao b{color:var(--ink)}
+  .atencao.risco{background:var(--stop-soft)}
+
+  /* tabela resumo */
+  table.res{width:100%;border-collapse:collapse;background:var(--surface);
+    border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+  table.res th,table.res td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--rule);font-size:13.5px}
+  table.res th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+    font-weight:500;background:var(--surface-2)}
+  table.res tr:last-child td{border-bottom:none}
+  table.res td:first-child{font-weight:600;color:var(--ink)}
+  table.res td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .scroll{overflow-x:auto}
+
+  footer{margin-top:50px;padding-top:18px;border-top:1px solid var(--rule);
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);
+    display:flex;flex-wrap:wrap;gap:6px 20px}
+</style>
+<style>
+  html,body{margin:0;padding:0}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <p class="brandline">RHEXA · Saquetti</p>
+    <h1>Contas que o cliente precisa abrir</h1>
+    <p>Cada item traz para que serve, quem cria, quanto custa e onde costuma travar.
+       Tudo deve ficar no nome da empresa — esse é o ponto que mais dá dor de cabeça depois.</p>
+  </header>
+
+  <div class="ouro">
+    <h3>Antes de abrir qualquer conta, decida isto</h3>
+    <p><b>Todas as contas no CNPJ do cliente, nunca no nome de uma pessoa nem da agência.</b>
+       Conta pessoal vira refém: se a pessoa sai da empresa ou o contrato com o fornecedor termina,
+       o acesso vai junto — e em loja de aplicativo isso significa perder o app publicado.</p>
+    <p><b>Use um e-mail de função, não o de alguém.</b> Algo como
+       <code>tecnologia@empresa.com.br</code> em vez de <code>joao@empresa.com.br</code>.
+       Quem responde pode mudar; a conta fica.</p>
+    <p><b>Ative verificação em duas etapas em todas</b> e guarde os códigos de recuperação
+       num cofre de senhas compartilhado. Apple e Google não restauram acesso perdido com facilidade.</p>
+  </div>
+
+  <section>
+    <h2>Em que ordem fazer</h2>
+    <p class="lede">A ordem importa: dois itens têm prazo de aprovação que não depende de nós e
+      travam o resto se ficarem para depois.</p>
+    <div class="fases">
+      <div class="fase urgente">
+        <span class="quando">Comece hoje</span>
+        <h3>Prazo longo</h3>
+        <ul>
+          <li>Apple Developer (D-U-N-S)</li>
+          <li>Google Play Console</li>
+          <li>Domínio</li>
+        </ul>
+      </div>
+      <div class="fase infra">
+        <span class="quando">Na sequência</span>
+        <h3>Infraestrutura</h3>
+        <ul>
+          <li>Supabase</li>
+          <li>Vercel</li>
+          <li>Resend</li>
+          <li>Firebase</li>
+          <li>Expo</li>
+        </ul>
+      </div>
+      <div class="fase lanc">
+        <span class="quando">Antes de publicar</span>
+        <h3>Exigências das lojas</h3>
+        <ul>
+          <li>Política de privacidade</li>
+          <li>Conta de e-mail de suporte</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Passo a passo, item por item</h2>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">1</div><h3>E-mail corporativo de função</h3>
+        <span class="faltava">Faltava na lista</span></div>
+      <p class="pra-que">É o pré-requisito de todo o resto: será o dono de cada conta a seguir.
+        Criar depois significa refazer cadastros.</p>
+      <div class="meta"><span class="m"><b>Custo</b> já incluso no e-mail da empresa</span>
+        <span class="m"><b>Prazo</b> minutos</span><span class="m"><b>Quem</b> TI do cliente</span></div>
+      <ol class="passos">
+        <li>Crie <code>tecnologia@</code> (ou similar) no provedor de e-mail da empresa.</li>
+        <li>Deixe <b>pelo menos duas pessoas</b> com acesso à caixa.</li>
+        <li>Use esse endereço em todos os cadastros abaixo.</li>
+      </ol>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">2</div><h3>Domínio</h3></div>
+      <p class="pra-que">Endereço das plataformas web e base para o envio de e-mails. Os subdomínios
+        saem todos dele — por exemplo <code>gestor.</code> para o portal da empresa e
+        <code>admin.</code> para o ambiente interno.</p>
+      <div class="meta"><span class="m"><b>Custo</b> ~R$ 40–70 por ano</span>
+        <span class="m"><b>Prazo</b> imediato</span><span class="m"><b>Quem</b> cliente</span></div>
+      <ol class="passos">
+        <li>Registre no <b>Registro.br</b> (para <code>.com.br</code>) ou num registrador internacional.</li>
+        <li>Não precisa contratar hospedagem — a Vercel cuida disso.</li>
+        <li>Dê ao time de desenvolvimento <b>acesso ao painel de DNS</b>. É onde apontaremos os
+          subdomínios e os registros de e-mail.</li>
+        <li>Ative a <b>renovação automática</b>. Domínio expirado derruba site e e-mail ao mesmo tempo.</li>
+      </ol>
+      <div class="atencao"><b>Decidam agora os subdomínios</b>, porque eles aparecem em documento e
+        material impresso depois: sugestão <code>gestor.seudominio.com.br</code> para o portal da
+        empresa e <code>admin.seudominio.com.br</code> para o ambiente interno da Saquetti.</div>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">3</div><h3>Apple Developer Program</h3>
+        <span class="faltava">Faltava na lista</span></div>
+      <p class="pra-que">Sem isso o app não entra na App Store nem recebe notificação push no iPhone.
+        <b>É o item de prazo mais longo de todos</b> — por isso vem antes da infraestrutura.</p>
+      <div class="meta"><span class="m"><b>Custo</b> ~US$ 99 por ano</span>
+        <span class="m"><b>Prazo</b> de dias a semanas</span><span class="m"><b>Quem</b> cliente (jurídico + TI)</span></div>
+      <ol class="passos">
+        <li><b>Obtenha o número D-U-N-S</b> da empresa em <code>developer.apple.com/enroll</code>.
+          É gratuito, mas emitido pela Dun &amp; Bradstreet e pode demorar. <b>Faça isso primeiro.</b></li>
+        <li>Com o D-U-N-S em mãos, inscreva-se como <b>Organização</b> (não como indivíduo).</li>
+        <li>A Apple liga ou envia e-mail para confirmar que quem pediu representa a empresa.</li>
+        <li>Depois de aprovado, adicione a equipe de desenvolvimento como membros.</li>
+      </ol>
+      <div class="atencao risco"><b>O erro clássico:</b> inscrever-se como indivíduo porque é mais
+        rápido. O app fica no CPF de uma pessoa, aparece na loja com o nome dela e migrar depois é
+        burocrático. Se o app é da empresa, a conta precisa ser de Organização.</div>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">4</div><h3>Google Play Console</h3>
+        <span class="faltava">Faltava na lista</span></div>
+      <p class="pra-que">Publicação do app Android. Mesma lógica da Apple, com burocracia menor.</p>
+      <div class="meta"><span class="m"><b>Custo</b> ~US$ 25 uma única vez</span>
+        <span class="m"><b>Prazo</b> dias</span><span class="m"><b>Quem</b> cliente</span></div>
+      <ol class="passos">
+        <li>Crie a conta em <code>play.google.com/console</code> como <b>Organização</b>.</li>
+        <li>Contas de organização também pedem <b>D-U-N-S</b> — aproveite o mesmo obtido para a Apple.</li>
+        <li>O Google exige comprovação de endereço e telefone da empresa.</li>
+        <li>Convide o time de desenvolvimento com permissão de publicação.</li>
+      </ol>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">5</div><h3>Supabase</h3></div>
+      <p class="pra-que">Banco de dados, autenticação, arquivos e as funções de servidor. É o coração
+        do sistema — onde ficam as marcações de ponto.</p>
+      <div class="meta"><span class="m"><b>Custo</b> gratuito para testes · ~US$ 25/mês em produção</span>
+        <span class="m"><b>Prazo</b> minutos</span><span class="m"><b>Quem</b> cliente</span></div>
+      <ol class="passos">
+        <li>Crie a conta em <code>supabase.com</code> e depois uma <b>Organização</b> com o nome da empresa.</li>
+        <li>Convide o time de desenvolvimento para a organização.</li>
+        <li>Deixe que o time crie o <b>projeto de produção</b> — há configurações de região e senha
+          de banco que precisam ser feitas junto.</li>
+        <li>Escolha a região <b>São Paulo</b>: dado de ponto é dado pessoal e a latência é menor.</li>
+      </ol>
+      <div class="atencao"><b>O plano gratuito não serve para produção:</b> o projeto é pausado após
+        alguns dias sem uso e não há backup para recuperar um dado apagado por engano. Para um sistema
+        de ponto, onde o registro é prova trabalhista, o plano pago é requisito, não luxo.</div>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">6</div><h3>Vercel</h3></div>
+      <p class="pra-que">Hospedagem do Portal da Empresa e do ambiente Admin. <b>Ainda não existe app
+        web construído</b> — essa conta só será usada quando o portal começar.</p>
+      <div class="meta"><span class="m"><b>Custo</b> ~US$ 20/mês por usuário</span>
+        <span class="m"><b>Prazo</b> minutos</span><span class="m"><b>Quem</b> cliente</span></div>
+      <ol class="passos">
+        <li>Crie a conta em <code>vercel.com</code> e um <b>Team</b> com o nome da empresa.</li>
+        <li>Conecte ao repositório de código.</li>
+        <li>Aponte os subdomínios <code>gestor.</code> e <code>admin.</code> nas configurações de domínio.</li>
+      </ol>
+      <div class="atencao risco"><b>Cuidado com o plano gratuito:</b> o Hobby da Vercel não é
+        licenciado para uso comercial. Para um produto que a empresa vende, o plano pago é obrigatório
+        pelos termos de uso — não é só questão de limite técnico.</div>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">7</div><h3>Resend</h3></div>
+      <p class="pra-que">Envio de e-mails do sistema: recuperação de senha, avisos de pendência e
+        notificações do gestor.</p>
+      <div class="meta"><span class="m"><b>Custo</b> gratuito até 3.000/mês · pago a partir de ~US$ 20</span>
+        <span class="m"><b>Prazo</b> minutos + propagação de DNS</span><span class="m"><b>Quem</b> cliente</span></div>
+      <ol class="passos">
+        <li>Crie a conta em <code>resend.com</code>.</li>
+        <li>Adicione o domínio da empresa e <b>configure os registros de DNS</b> que o Resend indicar
+          (SPF, DKIM e DMARC).</li>
+        <li>Espere a verificação — costuma levar de minutos a algumas horas.</li>
+        <li>Defina o remetente, por exemplo <code>nao-responda@seudominio.com.br</code>.</li>
+      </ol>
+      <div class="atencao"><b>Por que os registros de DNS importam:</b> sem eles o e-mail sai, mas cai
+        no spam. Num sistema de ponto isso é grave — o trabalhador que não recebe o link de
+        recuperação simplesmente não entra no app.</div>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">8</div><h3>Firebase</h3></div>
+      <p class="pra-que">Entrega das notificações push no Android. <b>Sozinho não resolve o iPhone</b> —
+        para iOS é preciso uma chave gerada na conta Apple Developer.</p>
+      <div class="meta"><span class="m"><b>Custo</b> gratuito para push</span>
+        <span class="m"><b>Prazo</b> minutos</span><span class="m"><b>Quem</b> cliente</span></div>
+      <ol class="passos">
+        <li>Crie o projeto em <code>console.firebase.google.com</code> com a conta corporativa.</li>
+        <li>Adicione um app Android com o identificador <code>br.com.rhexa.trabalhador</code>.</li>
+        <li>Gere a <b>chave de conta de serviço</b> e entregue ao time de desenvolvimento.</li>
+        <li>Para iPhone, gere a <b>chave APNs</b> dentro da conta Apple Developer.</li>
+      </ol>
+      <div class="atencao"><b>Contexto honesto:</b> a notificação push ainda não está implementada no
+        app. Criar a conta agora não custa nada e evita espera depois, mas não é bloqueio para o
+        lançamento do app do trabalhador.</div>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">9</div><h3>Expo</h3>
+        <span class="faltava">Faltava na lista</span></div>
+      <p class="pra-que">Serviço que compila o aplicativo e envia para as lojas. <b>Hoje o projeto está
+        na conta pessoal do desenvolvedor</b> — precisa migrar antes do lançamento.</p>
+      <div class="meta"><span class="m"><b>Custo</b> gratuito no início · ~US$ 99/mês se o volume crescer</span>
+        <span class="m"><b>Prazo</b> minutos</span><span class="m"><b>Quem</b> cliente</span></div>
+      <ol class="passos">
+        <li>Crie a conta em <code>expo.dev</code> e uma <b>Organização</b> com o nome da empresa.</li>
+        <li>Convide o time de desenvolvimento.</li>
+        <li>Peça a transferência do projeto <code>saquetti-mobile</code> para essa organização.</li>
+      </ol>
+      <div class="atencao risco"><b>Por que isso importa:</b> é nessa conta que fica a chave que
+        assina o aplicativo Android. Perder o acesso a ela significa não conseguir mais publicar
+        atualização do app instalado — os usuários teriam que desinstalar e instalar de novo.</div>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">10</div><h3>Política de privacidade publicada</h3>
+        <span class="faltava">Faltava na lista</span></div>
+      <p class="pra-que">Não é uma conta, mas <b>as duas lojas recusam o app sem isso</b>. Precisa ser
+        um endereço público e permanente.</p>
+      <div class="meta"><span class="m"><b>Custo</b> jurídico do cliente</span>
+        <span class="m"><b>Prazo</b> depende do jurídico</span><span class="m"><b>Quem</b> cliente (jurídico)</span></div>
+      <ol class="passos">
+        <li>Redija cobrindo o que o app coleta: <b>localização, foto e dados de jornada</b>.</li>
+        <li>Explique a base legal sob a LGPD e por quanto tempo os dados são guardados.</li>
+        <li>Publique em <code>seudominio.com.br/privacidade</code>.</li>
+        <li>Informe um <b>contato de encarregado de dados</b>, exigido pela LGPD.</li>
+      </ol>
+      <div class="atencao"><b>Atenção ao conteúdo:</b> o app captura localização e foto do rosto no
+        registro de ponto. São dados sensíveis, e as lojas verificam se a política declara isso de
+        forma explícita. Uma política genérica costuma ser rejeitada.</div>
+    </div>
+
+  </section>
+
+  <section>
+    <h2>Só se vocês decidirem por isso</h2>
+    <p class="lede">Dois itens dependem de decisões que ainda estão em aberto no projeto. Não abra a
+      conta antes de decidir — evita pagar por algo que não será usado.</p>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">11</div><h3>Provedor de SMS</h3>
+        <span class="faltava">Faltava na lista</span></div>
+      <p class="pra-que">Só necessário <b>se</b> a recuperação de senha for por SMS em vez de e-mail.
+        Essa definição ainda está pendente no projeto.</p>
+      <div class="meta"><span class="m"><b>Custo</b> por mensagem enviada</span>
+        <span class="m"><b>Quem</b> cliente</span><span class="m"><b>Depende de</b> decisão do canal</span></div>
+      <ol class="passos">
+        <li>Decidam primeiro: <b>SMS ou e-mail?</b> Se for e-mail, o Resend já resolve e este item cai.</li>
+        <li>Se for SMS, considere Zenvia ou Twilio. No Brasil, envio para celular exige cadastro prévio.</li>
+      </ol>
+    </div>
+
+    <div class="conta">
+      <div class="conta-head"><div class="n">12</div><h3>Monitoramento de erros</h3>
+        <span class="faltava">Faltava na lista</span></div>
+      <p class="pra-que">Avisa quando o app quebra no celular de um trabalhador de verdade. Sem isso,
+        vocês só descobrem o problema quando alguém liga reclamando.</p>
+      <div class="meta"><span class="m"><b>Custo</b> gratuito no início</span>
+        <span class="m"><b>Quem</b> cliente</span><span class="m"><b>Quando</b> antes do lançamento</span></div>
+      <ol class="passos">
+        <li>Crie conta no <b>Sentry</b> (<code>sentry.io</code>), plano gratuito.</li>
+        <li>O time de desenvolvimento conecta ao app e aos portais.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <h2>Resumo</h2>
+    <div class="scroll">
+      <table class="res">
+        <thead><tr><th>Serviço</th><th>Para quê</th><th>Custo aproximado</th><th>Prazo</th></tr></thead>
+        <tbody>
+          <tr><td>E-mail de função</td><td>Dono de todas as contas</td><td class="num">—</td><td class="num">minutos</td></tr>
+          <tr><td>Domínio</td><td>Site, portais e e-mail</td><td class="num">R$ 40–70/ano</td><td class="num">imediato</td></tr>
+          <tr><td>Apple Developer</td><td>App Store e push no iPhone</td><td class="num">US$ 99/ano</td><td class="num">dias a semanas</td></tr>
+          <tr><td>Google Play</td><td>Play Store</td><td class="num">US$ 25 única vez</td><td class="num">dias</td></tr>
+          <tr><td>Supabase</td><td>Banco, login e arquivos</td><td class="num">US$ 25/mês</td><td class="num">minutos</td></tr>
+          <tr><td>Vercel</td><td>Portais web</td><td class="num">US$ 20/mês</td><td class="num">minutos</td></tr>
+          <tr><td>Resend</td><td>Envio de e-mails</td><td class="num">grátis até 3.000/mês</td><td class="num">minutos + DNS</td></tr>
+          <tr><td>Firebase</td><td>Push no Android</td><td class="num">grátis</td><td class="num">minutos</td></tr>
+          <tr><td>Expo</td><td>Compilar e publicar o app</td><td class="num">grátis no início</td><td class="num">minutos</td></tr>
+          <tr><td>Política de privacidade</td><td>Exigência das lojas</td><td class="num">jurídico</td><td class="num">variável</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="atencao" style="margin-top:16px"><b>Sobre os valores:</b> são referências para
+      planejamento, não cotação. Preços de plataforma mudam e alguns variam com o câmbio —
+      confirme no site de cada serviço no momento da contratação.</div>
+  </section>
+
+  <footer>
+    <span>RHEXA · Saquetti</span>
+    <span>Checklist de contas e serviços</span>
+    <span>25/09/2026</span>
+  </footer>
+
+</div>
+</body>
+</html>
