@@ -48,8 +48,12 @@ export async function getResumoHome(nomeColaborador: string): Promise<ResumoHome
 
   // Folgas ficam de fora (não há jornada a mostrar); faltas entram, senão o
   // filtro por situação nunca teria o que exibir.
-  const registros = espelho.dias
-    .filter((d) => d.tipo !== 'folga')
+  //
+  // Exceção: quem não tem NENHUMA marcação no mês não pode ser acusado de faltar
+  // — pode ter sido cadastrado agora. Sem data de admissão no cadastro não há como
+  // distinguir, então nesse caso a lista fica vazia e a Home mostra o estado inicial.
+  const temHistorico = espelho.dias.some((d) => d.marcacoes.length > 0);
+  const registros = (temHistorico ? espelho.dias.filter((d) => d.tipo !== 'folga') : [])
     .slice(0, 10)
     .map((d) => ({
       id: d.id,

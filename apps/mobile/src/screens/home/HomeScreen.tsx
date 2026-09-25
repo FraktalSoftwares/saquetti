@@ -253,29 +253,46 @@ function JornadaCard({ resumo }: { resumo: ResumoHome }) {
 
 function DiaCard({ dia }: { dia: RegistroDia }) {
   const [aberto, setAberto] = useState(false);
+  // Dia sem nenhuma batida não tem horas nem detalhe para abrir: vira um card
+  // compacto, em vez de "0 marcações · trabalhado —" seguido de espaço vazio.
+  const semRegistro = dia.totalMarcacoes === 0;
+
   return (
     <View style={styles.diaCard}>
       <Pressable
         style={styles.diaHeader}
-        onPress={() => setAberto((v) => !v)}
+        onPress={() => !semRegistro && setAberto((v) => !v)}
+        disabled={semRegistro}
         accessibilityRole="button"
-        accessibilityState={{ expanded: aberto }}
+        accessibilityState={{ expanded: aberto, disabled: semRegistro }}
       >
         <View style={styles.flex1}>
           <Text style={styles.diaTitulo}>{dia.rotulo}</Text>
-          <Text style={styles.diaResumo}>
-            {dia.totalMarcacoes} marcações · trabalhado{' '}
-            <Text style={styles.diaTrabalhado}>{dia.trabalhado}</Text>
-          </Text>
-          <Text style={styles.diaHoras}>
-            {dia.marcacoes.map((m) => m.hora).join('   ·   ')}
-          </Text>
+          {semRegistro ? (
+            <Text style={styles.diaSemRegistro}>Nenhuma marcação registrada</Text>
+          ) : (
+            <>
+              <Text style={styles.diaResumo}>
+                {dia.totalMarcacoes} marcações · trabalhado{' '}
+                <Text style={styles.diaTrabalhado}>{dia.trabalhado}</Text>
+              </Text>
+              <Text style={styles.diaHoras}>
+                {dia.marcacoes.map((m) => m.hora).join('   ·   ')}
+              </Text>
+            </>
+          )}
         </View>
-        <Ionicons
-          name={aberto ? 'chevron-up' : 'chevron-down'}
-          size={20}
-          color={colors.textSecondary}
-        />
+        {semRegistro ? (
+          <View style={styles.faltaBadge}>
+            <Text style={styles.faltaBadgeText}>Falta</Text>
+          </View>
+        ) : (
+          <Ionicons
+            name={aberto ? 'chevron-up' : 'chevron-down'}
+            size={20}
+            color={colors.textSecondary}
+          />
+        )}
       </Pressable>
 
       {aberto && (
@@ -433,6 +450,15 @@ const styles = StyleSheet.create({
   diaResumo: { ...typography.body, color: colors.textSecondary, marginTop: 2 },
   diaTrabalhado: { color: colors.success, fontFamily: typography.bodySemibold.fontFamily },
   diaHoras: { ...typography.bodySemibold, fontSize: 15, color: colors.textPrimary, marginTop: spacing.sm },
+  diaSemRegistro: { ...typography.body, fontSize: 13.5, color: colors.textMuted, marginTop: 2 },
+  faltaBadge: {
+    backgroundColor: colors.dangerBg,
+    borderRadius: 12,
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+    alignSelf: 'center',
+  },
+  faltaBadgeText: { ...typography.caption, fontSize: 12, color: colors.dangerText, fontWeight: '600' },
 
   diaDetalhe: { marginTop: spacing.md, borderTopWidth: 1, borderTopColor: colors.borderLight, paddingTop: spacing.sm },
   marcacaoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
