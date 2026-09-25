@@ -51,7 +51,11 @@ export function AssinarCartaoScreen({ navigation, route }: AppStackScreenProps<'
             value={mes?.saldo ?? '—'}
             valueColor={mes?.saldoPositivo ? colors.success : colors.danger}
           />
-          <Linha label="Inconsistências" value="2" valueColor="#D97706" />
+          <Linha
+            label="Inconsistências"
+            value={mes ? String(mes.inconsistencias) : "—"}
+            valueColor={mes && mes.inconsistencias > 0 ? "#D97706" : colors.textPrimary}
+          />
         </View>
 
         <View style={styles.warn}>

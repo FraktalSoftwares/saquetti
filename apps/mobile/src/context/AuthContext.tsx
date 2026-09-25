@@ -16,6 +16,13 @@ type AuthContextValue = {
   clearAuthError: () => void;
   /** Recarrega o perfil (ex.: após editar o contato em 8.1). */
   refreshColaborador: () => Promise<void>;
+  /**
+   * true quando a sessao atual veio do link de recuperacao de senha. A sessao e
+   * valida, entao sem esta flag o app entraria direto na Home e o usuario nunca
+   * chegaria a tela 1.4 para definir a nova senha.
+   */
+  recoveryMode: boolean;
+  clearRecoveryMode: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -26,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [colaborador, setColaborador] = useState<Colaborador | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [recoveryMode, setRecoveryMode] = useState(false);
   const activeRef = useRef(true);
 
   /**
@@ -81,6 +89,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, next) => {
       // A sessão inicial já é tratada por getSession() acima; evita validar/deslogar em dobro.
       if (event === 'INITIAL_SESSION') return;
+      // Sessão aberta pelo link de recuperação: precisa passar pela tela 1.4.
+      if (event === 'PASSWORD_RECOVERY') setRecoveryMode(true);
+      if (event === 'SIGNED_OUT') setRecoveryMode(false);
       setSession(next);
       await validate(next);
     });
@@ -100,8 +111,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       authError,
       clearAuthError: () => setAuthError(null),
       refreshColaborador,
+      recoveryMode,
+      clearRecoveryMode: () => setRecoveryMode(false),
     }),
-    [initializing, profileLoading, session, colaborador, authError],
+    [initializing, profileLoading, session, colaborador, authError, recoveryMode],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

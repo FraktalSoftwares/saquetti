@@ -21,6 +21,7 @@ type Item = {
 export function PerfilScreen({ navigation }: AppTabScreenProps<'Perfil'>) {
   const insets = useSafeAreaInsets();
   const { colaborador } = useAuth();
+  const subtitulo = [colaborador?.cargo, colaborador?.departamento].filter(Boolean).join(' · ');
 
   const itens: Item[] = [
     { key: 'dados', label: 'Meus dados', icon: 'person-outline', onPress: () => navigation.navigate('MeusDados') },
@@ -38,7 +39,9 @@ export function PerfilScreen({ navigation }: AppTabScreenProps<'Perfil'>) {
           <Avatar size={58} radius={14} />
           <View>
             <Text style={styles.nome}>{colaborador?.nomeCompleto ?? 'Colaborador'}</Text>
-            <Text style={styles.cargo}>Saquetti · Operações</Text>
+            {/* Vem do cadastro; quem ainda não tem cargo/departamento não exibe nada,
+                em vez de herdar o texto fixo que aparecia para qualquer usuário. */}
+            {subtitulo ? <Text style={styles.cargo}>{subtitulo}</Text> : null}
           </View>
         </View>
       </View>

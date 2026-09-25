@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Roteiro de demonstração do app do trabalhador RHEXA, com arquitetura, tecnologia e funcionalidades.">
+<title>Demo RHEXA Trabalhador</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap">
+<style>
+  :root{
+    --ground:#F4F6FA;
+    --surface:#FFFFFF;
+    --surface-2:#EAEEF5;
+    --ink:#0B1220;
+    --ink-2:#3C4859;
+    --ink-3:#6C7A8C;
+    --rule:#D9E0EA;
+    --brand:#3D71B8;
+    --brand-soft:#E7EEF8;
+    --navy:#010A28;
+    --ok:#1B7F51;
+    --ok-soft:#E2F1E9;
+    --warn:#9A5B08;
+    --warn-soft:#FBEEDA;
+    --stop:#B33A2F;
+    --stop-soft:#F9E5E2;
+    --shadow:0 1px 2px rgba(11,18,32,.05),0 10px 28px rgba(11,18,32,.06);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:15px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 22px 80px}
+  h1,h2,h3{font-family:Sora,system-ui,sans-serif;margin:0;text-wrap:balance}
+  .mono,code{font-family:"IBM Plex Mono",ui-monospace,monospace}
+
+  /* masthead */
+  .mast{background:var(--navy);border-radius:14px;padding:30px 32px;color:#fff}
+  .brandline{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:#8FB4E4;margin:0 0 12px}
+  .mast h1{font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.02em;line-height:1.08;color:#fff}
+  .mast p{margin:12px 0 0;color:#B9C7DC;max-width:58ch}
+  .mast .facts{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+  .fact{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+    border-radius:8px;padding:7px 12px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:#DCE6F4}
+
+  section{margin-top:46px}
+  h2{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink);padding-bottom:10px;border-bottom:2px solid var(--ink);margin-bottom:8px}
+  .lede{color:var(--ink-2);max-width:68ch;margin:12px 0 24px}
+
+  /* credenciais */
+  .creds{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:700px){.creds{grid-template-columns:1fr}}
+  .cred{background:var(--surface);border:1px solid var(--rule);border-radius:10px;
+    padding:16px 18px;box-shadow:var(--shadow)}
+  .cred .who{font-family:Sora,sans-serif;font-size:16px;font-weight:600}
+  .cred .role{font-size:12.5px;color:var(--ink-3);margin-bottom:10px}
+  .cred dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0}
+  .cred dt{font-size:12px;color:var(--ink-3)}
+  .cred dd{margin:0;font-family:"IBM Plex Mono",monospace;font-size:13.5px;font-variant-numeric:tabular-nums}
+  .cred.laura{border-left:4px solid var(--brand)}
+  .cred.novo{border-left:4px solid var(--ok)}
+
+  /* roteiro */
+  ol.roteiro{list-style:none;margin:0;padding:0;counter-reset:p}
+  ol.roteiro>li{counter-increment:p;display:grid;grid-template-columns:52px 1fr;gap:18px;
+    padding-bottom:24px;position:relative}
+  ol.roteiro>li:not(:last-child)::after{content:"";position:absolute;left:25px;top:52px;bottom:0;
+    width:2px;background:var(--rule)}
+  .num{width:52px;height:52px;border-radius:50%;background:var(--brand);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-family:Sora,sans-serif;
+    font-size:19px;font-weight:700;z-index:1}
+  .stepbody{padding-top:3px}
+  .stephead{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+  .stephead h3{font-size:18px;font-weight:600;letter-spacing:-.01em}
+  .dur{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);
+    background:var(--surface-2);border-radius:5px;padding:2px 8px}
+  .do,.say{margin:10px 0 0;padding-left:14px;border-left:2px solid var(--rule)}
+  .do{color:var(--ink-2)}
+  .do b,.say b{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    font-family:"IBM Plex Mono",monospace;color:var(--ink-3);margin-bottom:3px;font-weight:500}
+  .say{border-left-color:var(--brand);color:var(--ink)}
+  .say i{font-style:normal;color:var(--ink);font-weight:500}
+  .destaque{margin-top:12px;background:var(--brand-soft);border-radius:8px;padding:11px 14px;
+    font-size:13.5px;color:var(--ink-2)}
+  .destaque b{color:var(--ink)}
+
+  /* evitar */
+  ul.evitar{list-style:none;margin:0;padding:0;display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;
+    background:var(--rule);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+  ul.evitar li{background:var(--surface);padding:13px 16px}
+  ul.evitar b{display:block;font-size:14px;color:var(--ink)}
+  ul.evitar span{font-size:12.5px;color:var(--ink-3)}
+
+  /* arquitetura */
+  .diagrama{background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+    padding:20px;overflow-x:auto;box-shadow:var(--shadow)}
+  .diagrama svg{display:block;min-width:660px;width:100%;height:auto}
+
+  .stack{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:22px}
+  .layer{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:15px 17px}
+  .layer h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);margin-bottom:9px}
+  .layer ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+  .layer li{font-size:13.5px;color:var(--ink-2)}
+  .layer .v{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3)}
+
+  /* funcionalidades */
+  .mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .mod{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px 18px}
+  .mod h3{font-size:15px;font-weight:600;margin-bottom:4px}
+  .mod .tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--brand);
+    letter-spacing:.08em;display:block;margin-bottom:8px}
+  .mod ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:4px}
+  .mod li{font-size:13px;color:var(--ink-2)}
+
+  /* seguranca */
+  .seg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+  .segitem{background:var(--ok-soft);border:1px solid var(--rule);border-radius:10px;padding:15px 17px}
+  .segitem b{display:block;font-size:14px;color:var(--ink);margin-bottom:4px}
+  .segitem span{font-size:13px;color:var(--ink-2)}
+
+  /* proximos */
+  table.next{width:100%;border-collapse:collapse;background:var(--surface);
+    border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+  table.next th,table.next td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--rule);font-size:13.5px}
+  table.next th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+    font-weight:500;background:var(--surface-2)}
+  table.next tr:last-child td{border-bottom:none}
+  table.next td:first-child{font-weight:600;color:var(--ink)}
+  .pill{font-family:"IBM Plex Mono",monospace;font-size:10.5px;padding:3px 8px;border-radius:5px;white-space:nowrap}
+  .pill.dec{background:var(--warn-soft);color:var(--warn)}
+  .pill.dev{background:var(--brand-soft);color:var(--brand)}
+
+  footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--rule);
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);
+    display:flex;flex-wrap:wrap;gap:6px 20px}
+</style>
+<style>
+  /* O artifact injeta um reset básico; aqui ele precisa ser explícito. */
+  html,body{margin:0;padding:0}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <p class="brandline">RHEXA · Jornada Inteligente</p>
+    <h1>Demonstração do app do trabalhador</h1>
+    <p>Roteiro para conduzir a call e material de apoio sobre a arquitetura.
+       Cerca de 8 minutos de demonstração, seguidos da conversa técnica.</p>
+    <div class="facts">
+      <span class="fact">26 telas</span>
+      <span class="fact">6 tabelas · RLS em todas</span>
+      <span class="fact">12 políticas de acesso</span>
+      <span class="fact">1 Edge Function</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Antes de começar</h2>
+    <p class="lede">Deixe o app já instalado e <b>fora</b> de qualquer conta. A primeira tela que o
+      cliente vê deve ser o login — é o que sustenta a abertura.</p>
+    <div class="creds">
+      <div class="cred novo">
+        <div class="who">Carlos Mendes</div>
+        <div class="role">Conta zerada · para mostrar o primeiro uso</div>
+        <dl>
+          <dt>CPF</dt><dd>111.444.777-35</dd>
+          <dt>Senha</dt><dd>12345678</dd>
+        </dl>
+      </div>
+      <div class="cred laura">
+        <div class="who">Laura Gomes</div>
+        <div class="role">Mês em uso · para mostrar o histórico</div>
+        <dl>
+          <dt>CPF</dt><dd>529.982.247-25</dd>
+          <dt>Senha</dt><dd>12345678</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Roteiro da demonstração</h2>
+    <ol class="roteiro">
+
+      <li>
+        <div class="num">1</div>
+        <div class="stepbody">
+          <div class="stephead"><h3>Abra pelo problema, não pelo app</h3><span class="dur">30 s</span></div>
+          <p class="say"><b>Diga</b><i>“Ponto eletrônico não é só marcar hora — é prova. Se a marcação
+            não tiver quando, onde e quem, ela não serve numa fiscalização nem num processo.”</i></p>
+          <p class="do"><b>Faça</b>Ainda não toque no celular. Deixe a tela de login à vista.</p>
+        </div>
+      </li>
+
+      <li>
+        <div class="num">2</div>
+        <div class="stepbody">
+          <div class="stephead"><h3>Login por CPF</h3><span class="dur">30 s</span></div>
+          <p class="do"><b>Faça</b>Entre como <b>Carlos Mendes</b>. Digite o CPF devagar, para verem a máscara.</p>
+          <p class="say"><b>Diga</b><i>“O trabalhador entra com CPF, não com e-mail. O app valida os
+            dígitos antes de chamar o servidor, e bloqueia a conta após cinco tentativas erradas.”</i></p>
+        </div>
+      </li>
+
+      <li>
+        <div class="num">3</div>
+        <div class="stepbody">
+          <div class="stephead"><h3>O primeiro dia de um colaborador</h3><span class="dur">45 s</span></div>
+          <p class="do"><b>Faça</b>Mostre a Home vazia: jornada sem marcação, banco zerado.</p>
+          <p class="say"><b>Diga</b><i>“É assim que o app chega para quem entrou hoje na empresa.
+            Nada de configurar: o cadastro vem do RH e ele já abre pronto para bater o primeiro ponto.”</i></p>
+        </div>
+      </li>
+
+      <li>
+        <div class="num">4</div>
+        <div class="stepbody">
+          <div class="stephead"><h3>Registrar ponto — o coração da demo</h3><span class="dur">2 min</span></div>
+          <p class="do"><b>Faça</b>Toque em <b>Registrar Ponto</b>. Aponte o endereço e a precisão
+            (“±5 m”), depois a foto de verificação, a confirmação e o comprovante.</p>
+          <p class="say"><b>Diga</b><i>“Três provas em uma batida: horário do servidor, localização com
+            precisão, e foto de quem bateu. O comprovante fica com o trabalhador.”</i></p>
+          <div class="destaque"><b>O ponto mais forte:</b> se o GPS estiver negado ou desligado, o
+            botão de registrar fica <b>bloqueado</b> — o app não deixa gravar uma marcação sem prova
+            de origem. Vale dizer isso em voz alta; é o que diferencia de uma planilha.</div>
+        </div>
+      </li>
+
+      <li>
+        <div class="num">5</div>
+        <div class="stepbody">
+          <div class="stephead"><h3>Troque para a Laura: um mês em uso</h3><span class="dur">1 min 30</span></div>
+          <p class="do"><b>Faça</b>Saia da conta e entre como <b>Laura Gomes</b>. Vá em
+            <b>Cartão Ponto</b>. Navegue um mês para trás com a seta. Abra um dia e mostre as quatro
+            marcações. Toque em <b>Filtrar → Incompleto</b>.</p>
+          <p class="say"><b>Diga</b><i>“O espelho é calculado a partir das marcações: horas trabalhadas,
+            esperadas e o saldo do banco. Os dias problemáticos ficam evidentes — e dá para isolar só eles.”</i></p>
+        </div>
+      </li>
+
+      <li>
+        <div class="num">6</div>
+        <div class="stepbody">
+          <div class="stephead"><h3>Assinatura eletrônica</h3><span class="dur">1 min 30</span></div>
+          <p class="do"><b>Faça</b>Aba <b>Assinatura</b> → abra a competência → <b>Prosseguir</b> →
+            assine com o dedo → confirme. Mostre o carimbo.</p>
+          <p class="say"><b>Diga</b><i>“O trabalhador confere o resumo, assina e recebe um carimbo com
+            data, hora, IP e coordenadas. Depois disso o cartão fica bloqueado para edição.”</i></p>
+          <div class="destaque"><b>Detalhe que impressiona quem é técnico:</b> o IP não é informado
+            pelo celular — é capturado <b>no servidor</b>, por uma função dedicada. Um aparelho
+            comprometido não consegue forjar essa informação.</div>
+        </div>
+      </li>
+
+      <li>
+        <div class="num">7</div>
+        <div class="stepbody">
+          <div class="stephead"><h3>Quando algo dá errado</h3><span class="dur">1 min</span></div>
+          <p class="do"><b>Faça</b>Abra um dia e toque em <b>Justificar Ausência</b>. Anexe um
+            comprovante (PDF ou imagem) e mostre o nome e o tamanho do arquivo na tela.</p>
+          <p class="say"><b>Diga</b><i>“Esqueceu de bater, faltou, teve atestado — o trabalhador
+            registra a justificativa com o documento anexado, e isso vai para a fila do gestor.”</i></p>
+        </div>
+      </li>
+
+      <li>
+        <div class="num">8</div>
+        <div class="stepbody">
+          <div class="stephead"><h3>Feche apontando o próximo passo</h3><span class="dur">30 s</span></div>
+          <p class="say"><b>Diga</b><i>“Esse é o lado do trabalhador, funcionando de ponta a ponta.
+            O próximo bloco é o Portal do Gestor, onde essas solicitações são aprovadas e o mês é fechado.”</i></p>
+          <p class="do"><b>Faça</b>Passe para a seção de arquitetura se houver gente técnica na call.</p>
+        </div>
+      </li>
+
+    </ol>
+  </section>
+
+  <section>
+    <h2>Não toque nestes durante a call</h2>
+    <p class="lede">Não são defeitos: são funcionalidades que dependem de decisões que ainda não
+      foram tomadas com o cliente. Se alguém perguntar, a resposta honesta é “está mapeado, depende
+      de definição de regra”.</p>
+    <ul class="evitar">
+      <li><b>Recusar assinatura</b><span>Falta definir o fluxo de recusa e se cabe ressalva.</span></li>
+      <li><b>Baixar PDF do cartão</b><span>O modelo do documento é definido no lado do gestor.</span></li>
+      <li><b>“…” nos Alertas</b><span>Sem ação definida para o menu.</span></li>
+      <li><b>Marcar notificação como lida</b><span>Ainda não implementado.</span></li>
+      <li><b>Esqueci minha senha</b><span>A tela funciona, mas o envio depende de definir o canal.</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Como o sistema é montado</h2>
+    <p class="lede">Duas peças: o aplicativo no aparelho e uma plataforma gerenciada na nuvem.
+      Não há servidor próprio para manter — o que reduz custo de operação e superfície de ataque.</p>
+
+    <div class="diagrama">
+      <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="O app no aparelho conversa por HTTPS com cinco serviços do Supabase: autenticação, banco de dados com RLS, arquivos, tempo real e função no servidor.">
+        <!-- app -->
+        <rect x="250" y="14" width="400" height="86" rx="12" fill="var(--brand-soft)" stroke="var(--brand)" stroke-width="1.5"/>
+        <text x="450" y="46" text-anchor="middle" font-family="Sora,sans-serif" font-size="17" font-weight="600" fill="var(--ink)">App RHEXA</text>
+        <text x="450" y="68" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" fill="var(--ink-2)">React Native · iOS e Android · 26 telas</text>
+        <text x="450" y="87" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="var(--ink-3)">GPS · câmera · sessão no aparelho</text>
+
+        <!-- seta -->
+        <line x1="450" y1="100" x2="450" y2="152" stroke="var(--ink-3)" stroke-width="1.5"/>
+        <path d="M444 146 L450 156 L456 146 Z" fill="var(--ink-3)"/>
+        <text x="466" y="133" font-family="IBM Plex Mono,monospace" font-size="11" fill="var(--ink-3)">HTTPS · token do próprio colaborador</text>
+
+        <!-- servicos -->
+        <rect x="10" y="166" width="164" height="104" rx="10" fill="var(--surface-2)" stroke="var(--rule)" stroke-width="1"/>
+        <text x="92" y="196" text-anchor="middle" font-family="Sora,sans-serif" font-size="14" font-weight="600" fill="var(--ink)">Autenticação</text>
+        <text x="92" y="218" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">Login por CPF</text>
+        <text x="92" y="236" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">Senha criptografada</text>
+
+        <rect x="189" y="166" width="164" height="104" rx="10" fill="var(--surface-2)" stroke="var(--rule)" stroke-width="1"/>
+        <text x="271" y="196" text-anchor="middle" font-family="Sora,sans-serif" font-size="14" font-weight="600" fill="var(--ink)">Banco de dados</text>
+        <text x="271" y="218" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">6 tabelas</text>
+        <text x="271" y="236" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">Cada um vê só o seu</text>
+
+        <rect x="368" y="166" width="164" height="104" rx="10" fill="var(--surface-2)" stroke="var(--rule)" stroke-width="1"/>
+        <text x="450" y="196" text-anchor="middle" font-family="Sora,sans-serif" font-size="14" font-weight="600" fill="var(--ink)">Arquivos</text>
+        <text x="450" y="218" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">Fotos do ponto</text>
+        <text x="450" y="236" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">Comprovantes</text>
+
+        <rect x="547" y="166" width="164" height="104" rx="10" fill="var(--surface-2)" stroke="var(--rule)" stroke-width="1"/>
+        <text x="629" y="196" text-anchor="middle" font-family="Sora,sans-serif" font-size="14" font-weight="600" fill="var(--ink)">Tempo real</text>
+        <text x="629" y="218" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">Home se atualiza</text>
+        <text x="629" y="236" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">sem recarregar</text>
+
+        <rect x="726" y="166" width="164" height="104" rx="10" fill="var(--brand-soft)" stroke="var(--brand)" stroke-width="1.5"/>
+        <text x="808" y="196" text-anchor="middle" font-family="Sora,sans-serif" font-size="14" font-weight="600" fill="var(--ink)">Função no servidor</text>
+        <text x="808" y="218" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">Carimbo da assinatura</text>
+        <text x="808" y="236" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="var(--ink-2)">IP capturado aqui</text>
+
+        <!-- rodape do diagrama -->
+        <line x1="10" y1="300" x2="890" y2="300" stroke="var(--rule)" stroke-width="1"/>
+        <text x="10" y="326" font-family="IBM Plex Mono,monospace" font-size="11.5" fill="var(--ink-3)">Plataforma gerenciada (Supabase) — sem servidor próprio para operar</text>
+      </svg>
+    </div>
+
+    <div class="stack">
+      <div class="layer">
+        <h3>Aplicativo</h3>
+        <ul>
+          <li>React Native <span class="v">0.86</span></li>
+          <li>Expo <span class="v">SDK 57</span></li>
+          <li>React <span class="v">19</span></li>
+          <li>TypeScript <span class="v">tipagem completa</span></li>
+        </ul>
+      </div>
+      <div class="layer">
+        <h3>Plataforma</h3>
+        <ul>
+          <li>Supabase <span class="v">Postgres gerenciado</span></li>
+          <li>Autenticação com token</li>
+          <li>Arquivos em buckets privados</li>
+          <li>Funções em Deno</li>
+        </ul>
+      </div>
+      <div class="layer">
+        <h3>Distribuição</h3>
+        <ul>
+          <li>Um código, <b>iOS e Android</b></li>
+          <li>Build na nuvem (EAS)</li>
+          <li>APK para teste interno</li>
+          <li>Pronto para as lojas</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Segurança — o que dizer se perguntarem</h2>
+    <div class="seg">
+      <div class="segitem">
+        <b>Cada um vê apenas o seu</b>
+        <span>A regra é aplicada no banco, não no aplicativo. Mesmo que alguém altere o app,
+          não alcança dados de outro colaborador.</span>
+      </div>
+      <div class="segitem">
+        <b>O trabalhador não edita o que é do RH</b>
+        <span>Ele altera telefone, e-mail e foto. Cargo, matrícula e situação de acesso são
+          somente leitura — garantido por permissão de coluna no banco.</span>
+      </div>
+      <div class="segitem">
+        <b>Fotos e documentos são privados</b>
+        <span>Ficam em pastas separadas por pessoa e só são exibidos por link temporário,
+          nunca por endereço público.</span>
+      </div>
+      <div class="segitem">
+        <b>O carimbo não vem do celular</b>
+        <span>O IP da assinatura é registrado pelo servidor. O aparelho não consegue informar
+          um valor falso.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Funcionalidades entregues</h2>
+    <div class="mods">
+      <div class="mod">
+        <h3>Acesso</h3><span class="tag">MÓDULO 1</span>
+        <ul><li>Login por CPF</li><li>Bloqueio após 5 tentativas</li><li>Troca de senha com confirmação da atual</li></ul>
+      </div>
+      <div class="mod">
+        <h3>Início</h3><span class="tag">MÓDULO 2</span>
+        <ul><li>Jornada do dia em andamento</li><li>Alertas de pendência</li><li>Atalhos para as áreas principais</li></ul>
+      </div>
+      <div class="mod">
+        <h3>Registro de ponto</h3><span class="tag">MÓDULO 3</span>
+        <ul><li>Localização com endereço e precisão</li><li>Foto de verificação</li><li>Comprovante para o trabalhador</li><li>Bloqueio sem GPS</li></ul>
+      </div>
+      <div class="mod">
+        <h3>Espelho e banco</h3><span class="tag">MÓDULO 4</span>
+        <ul><li>Cálculo de horas por dia</li><li>Saldo do banco de horas</li><li>Navegação entre meses</li><li>Filtro por situação</li></ul>
+      </div>
+      <div class="mod">
+        <h3>Solicitações</h3><span class="tag">MÓDULO 5</span>
+        <ul><li>Ajuste de marcação</li><li>Justificativa de ausência</li><li>Anexo de comprovante</li><li>Acompanhamento do status</li></ul>
+      </div>
+      <div class="mod">
+        <h3>Assinatura</h3><span class="tag">MÓDULO 7</span>
+        <ul><li>Conferência antes de assinar</li><li>Assinatura com o dedo</li><li>Carimbo com IP e coordenadas</li><li>Bloqueio após assinar</li></ul>
+      </div>
+      <div class="mod">
+        <h3>Perfil</h3><span class="tag">MÓDULO 8</span>
+        <ul><li>Dados do cadastro</li><li>Contato editável</li><li>Foto de perfil</li></ul>
+      </div>
+      <div class="mod">
+        <h3>Notificações</h3><span class="tag">MÓDULO 9</span>
+        <ul><li>Lista de avisos</li><li>Detalhe com ação</li><li>Atualização ao vivo</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>O que vem a seguir</h2>
+    <p class="lede">Use esta lista se o cliente perguntar “e o que falta?”. Separar o que depende de
+      decisão do que depende de desenvolvimento evita prometer prazo para o que ainda não foi definido.</p>
+    <table class="next">
+      <thead><tr><th>Item</th><th>Situação</th><th>Depende de</th></tr></thead>
+      <tbody>
+        <tr><td>Portal do Gestor</td><td><span class="pill dev">Desenvolvimento</span></td><td>Próximo bloco — aprovar solicitações e fechar o mês</td></tr>
+        <tr><td>Escala de trabalho</td><td><span class="pill dec">Decisão</span></td><td>Define jornada esperada, feriados e DSR</td></tr>
+        <tr><td>Regras do banco de horas</td><td><span class="pill dec">Decisão</span></td><td>Limites, compensação e validade do saldo</td></tr>
+        <tr><td>Recuperação de senha</td><td><span class="pill dec">Decisão</span></td><td>Canal do código: SMS ou e-mail</td></tr>
+        <tr><td>Cartão ponto em PDF</td><td><span class="pill dec">Decisão</span></td><td>Modelo do documento e o que ele deve conter</td></tr>
+        <tr><td>Publicação nas lojas</td><td><span class="pill dev">Desenvolvimento</span></td><td>Contas de publicação e política de privacidade</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <span>RHEXA · Ambiente Trabalhador</span>
+    <span>Roteiro de demonstração</span>
+    <span>25/09/2026</span>
+  </footer>
+
+</div>
+</body>
+</html>

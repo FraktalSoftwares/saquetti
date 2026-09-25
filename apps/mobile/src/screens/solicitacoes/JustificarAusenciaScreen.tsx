@@ -15,12 +15,25 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackButton, Button, DatePicker, FormField, Select } from '../../components';
 import { colors, radius, spacing, typography, layout } from '../../theme';
 import { getDia } from '../../services/espelhoService';
-import { addSolicitacao } from '../../services/solicitacoesService';
+import * as DocumentPicker from 'expo-document-picker';
+import {
+  ANEXO_TAMANHO_MAX,
+  addSolicitacao,
+  type AnexoLocal,
+} from '../../services/solicitacoesService';
 import { maskHora } from '../../utils/datetime';
 import type { AppStackScreenProps } from '../../navigation/types';
 
 const PERIODOS = ['Dia inteiro', 'Período 1', 'Período 2', 'Período 3', 'Período Específico'];
 const MOTIVOS = ['Atestado', 'Declaração Médica'];
+
+/** "1,4 MB" / "812 KB" — tamanho do comprovante para o trabalhador conferir. */
+function formatarTamanho(bytes: number | null): string {
+  if (bytes == null) return 'Arquivo anexado';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1).replace('.', ',')} MB`;
+}
 
 /** Tela 4.4 Justificar Ausência. */
 export function JustificarAusenciaScreen({ navigation, route }: AppStackScreenProps<'JustificarAusencia'>) {
@@ -34,12 +47,32 @@ export function JustificarAusenciaScreen({ navigation, route }: AppStackScreenPr
   const [fim, setFim] = useState('');
   const [motivo, setMotivo] = useState<string | null>(null);
   const [obs, setObs] = useState('');
-  const [anexo, setAnexo] = useState<string | null>(null);
+  const [anexo, setAnexo] = useState<AnexoLocal | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
   const especifico = periodo === 'Período Específico';
 
   const [enviando, setEnviando] = useState(false);
+
+  /** Abre o seletor do aparelho e valida tipo/tamanho antes de aceitar o comprovante. */
+  const escolherAnexo = async () => {
+    const res = await DocumentPicker.getDocumentAsync({
+      type: ['application/pdf', 'image/*'],
+      copyToCacheDirectory: true,
+      multiple: false,
+    });
+    if (res.canceled) return;
+    const f = res.assets[0];
+    if (!f) return;
+
+    const tipoOk = f.mimeType ? /^(application\/pdf|image\/)/.test(f.mimeType) : true;
+    if (!tipoOk) return setErro('O comprovante deve ser um PDF ou uma imagem.');
+    if (f.size != null && f.size > ANEXO_TAMANHO_MAX)
+      return setErro('O comprovante deve ter no máximo 10 MB.');
+
+    setErro(null);
+    setAnexo({ uri: f.uri, nome: f.name, mimeType: f.mimeType ?? null, tamanho: f.size ?? null });
+  };
 
   const enviar = async () => {
     if (enviando) return;
@@ -55,10 +88,15 @@ export function JustificarAusenciaScreen({ navigation, route }: AppStackScreenPr
       motivo,
       periodo,
       observacao: obs,
+      anexo,
     });
     if (!nova) {
       setEnviando(false);
-      return setErro('Não foi possível enviar. Tente novamente.');
+      return setErro(
+        anexo
+          ? 'Não foi possível enviar o comprovante. Verifique a conexão e tente novamente.'
+          : 'Não foi possível enviar. Tente novamente.',
+      );
     }
     navigation.replace('Solicitacoes');
   };
@@ -130,16 +168,20 @@ export function JustificarAusenciaScreen({ navigation, route }: AppStackScreenPr
           </FormField>
 
           <FormField label="Comprovante">
-            <Pressable
-              style={styles.anexo}
-              onPress={() => setAnexo((a) => (a ? null : 'comprovante.pdf'))}
-              accessibilityRole="button"
-            >
-              <Ionicons name="cloud-upload-outline" size={24} color={colors.primary} />
+            <Pressable style={styles.anexo} onPress={escolherAnexo} accessibilityRole="button">
+              <Ionicons
+                name={anexo ? 'document-attach-outline' : 'cloud-upload-outline'}
+                size={24}
+                color={colors.primary}
+              />
               {anexo ? (
                 <>
-                  <Text style={styles.anexoNome}>{anexo}</Text>
-                  <Text style={styles.anexoHint}>Toque para substituir</Text>
+                  <Text style={styles.anexoNome} numberOfLines={1}>
+                    {anexo.nome}
+                  </Text>
+                  <Text style={styles.anexoHint}>
+                    {formatarTamanho(anexo.tamanho)} · toque para substituir
+                  </Text>
                 </>
               ) : (
                 <>
@@ -148,6 +190,17 @@ export function JustificarAusenciaScreen({ navigation, route }: AppStackScreenPr
                 </>
               )}
             </Pressable>
+            {anexo && (
+              <Pressable
+                style={styles.removerAnexo}
+                onPress={() => setAnexo(null)}
+                accessibilityRole="button"
+                hitSlop={8}
+              >
+                <Ionicons name="close-circle" size={15} color={colors.danger} />
+                <Text style={styles.removerAnexoText}>Remover comprovante</Text>
+              </Pressable>
+            )}
           </FormField>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -213,6 +266,14 @@ const styles = StyleSheet.create({
     paddingVertical: 22,
     paddingHorizontal: 16,
   },
+  removerAnexo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    alignSelf: 'center',
+    marginTop: spacing.sm,
+  },
+  removerAnexoText: { ...typography.caption, fontSize: 12.5, color: colors.danger },
   anexoNome: { ...typography.bodySemibold, fontSize: 14, color: colors.primary },
   anexoHint: { ...typography.caption, fontSize: 12.5, color: colors.textMuted },
 

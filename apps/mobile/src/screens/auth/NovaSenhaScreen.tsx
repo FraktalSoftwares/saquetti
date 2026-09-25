@@ -14,12 +14,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackButton, Button, PasswordField } from '../../components';
 import { colors, spacing, typography, layout } from '../../theme';
 import { evaluatePassword, isStrongPassword } from '../../utils/password';
-import { redefinirSenha } from '../../services/authService';
+import { logout, redefinirSenha } from '../../services/authService';
+import { useAuth } from '../../context/AuthContext';
 import type { AuthScreenProps } from '../../navigation/types';
 
 /** Tela 1.4 Nova senha (RF-003). */
 export function NovaSenhaScreen({ navigation }: AuthScreenProps<'NovaSenha'>) {
   const insets = useSafeAreaInsets();
+  const { clearRecoveryMode } = useAuth();
   const confirmarRef = useRef<TextInput>(null);
 
   const [senha, setSenha] = useState('');
@@ -56,6 +58,9 @@ export function NovaSenhaScreen({ navigation }: AuthScreenProps<'NovaSenha'>) {
     setLoading(false);
 
     if (result.ok) {
+      // Encerra a sessao de recuperacao e pede o login com a senha nova.
+      await logout();
+      clearRecoveryMode();
       navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
       return;
     }

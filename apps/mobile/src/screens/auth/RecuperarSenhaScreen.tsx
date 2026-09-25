@@ -24,6 +24,7 @@ export function RecuperarSenhaScreen({ navigation }: AuthScreenProps<'Recuperar'
   const [cpf, setCpf] = useState('');
   const [cpfError, setCpfError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [enviado, setEnviado] = useState(false);
 
   const handleEnviar = async () => {
     if (loading) return;
@@ -39,8 +40,10 @@ export function RecuperarSenhaScreen({ navigation }: AuthScreenProps<'Recuperar'
     setLoading(true);
     await solicitarRecuperacao(cpf);
     setLoading(false);
-    // Mensagem neutra por seguranca (nao revela se o CPF existe) e segue o fluxo.
-    navigation.navigate('NovaSenha');
+    // Confirmacao neutra: nao revela se o CPF existe. NAO navegamos para a tela de
+    // nova senha — ela exige a sessao de recuperacao aberta pelo link enviado, e ir
+    // para la direto era um beco sem saida (o salvamento sempre falhava).
+    setEnviado(true);
   };
 
   return (
@@ -58,25 +61,45 @@ export function RecuperarSenhaScreen({ navigation }: AuthScreenProps<'Recuperar'
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.title}>Recuperar senha</Text>
-          <Text style={styles.subtitle}>
-            Digite seu CPF para receber um código de verificação por SMS ou e-mail.
-          </Text>
 
-          <View style={styles.form}>
-            <TextField
-              label="CPF"
-              required
-              value={cpf}
-              onChangeText={(t) => setCpf(maskCpf(t))}
-              placeholder="000.000.000-00"
-              keyboardType="number-pad"
-              maxLength={14}
-              returnKeyType="done"
-              onSubmitEditing={handleEnviar}
-              error={cpfError}
-            />
-            <Button title="Enviar código" onPress={handleEnviar} loading={loading} />
-          </View>
+          {enviado ? (
+            <>
+              <Text style={styles.subtitle}>
+                Se o CPF informado tiver cadastro, enviamos um link de redefinição para o e-mail
+                registrado. Abra o link neste aparelho para criar a nova senha.
+              </Text>
+              <View style={styles.aviso}>
+                <Text style={styles.avisoText}>
+                  Não recebeu? Verifique o spam ou fale com o RH da sua empresa.
+                </Text>
+              </View>
+              <View style={styles.form}>
+                <Button title="Voltar ao login" onPress={() => navigation.navigate('Login')} />
+              </View>
+            </>
+          ) : (
+            <>
+              <Text style={styles.subtitle}>
+                Digite seu CPF e enviaremos as instruções para redefinir sua senha.
+              </Text>
+
+              <View style={styles.form}>
+                <TextField
+                  label="CPF"
+                  required
+                  value={cpf}
+                  onChangeText={(t) => setCpf(maskCpf(t))}
+                  placeholder="000.000.000-00"
+                  keyboardType="number-pad"
+                  maxLength={14}
+                  returnKeyType="done"
+                  onSubmitEditing={handleEnviar}
+                  error={cpfError}
+                />
+                <Button title="Enviar instruções" onPress={handleEnviar} loading={loading} />
+              </View>
+            </>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -90,4 +113,13 @@ const styles = StyleSheet.create({
   title: { ...typography.title, color: colors.textPrimary },
   subtitle: { ...typography.subtitle, color: colors.textSecondary, marginTop: spacing.md },
   form: { marginTop: spacing.xxl, gap: spacing.xl },
+  aviso: {
+    marginTop: spacing.xl,
+    backgroundColor: colors.infoBg,
+    borderWidth: 1,
+    borderColor: colors.infoBorder,
+    borderRadius: 10,
+    padding: spacing.md,
+  },
+  avisoText: { ...typography.body, fontSize: 13.5, color: colors.infoText },
 });

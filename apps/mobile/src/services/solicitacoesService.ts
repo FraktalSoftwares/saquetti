@@ -76,11 +76,59 @@ export type NovaSolicitacaoInput = {
   motivo?: string;
   periodo?: string;
   observacao?: string;
+  /** Comprovante escolhido pelo trabalhador (4.4). */
+  anexo?: AnexoLocal | null;
 };
+
+/** Arquivo selecionado no aparelho, antes do upload. */
+export type AnexoLocal = {
+  uri: string;
+  nome: string;
+  mimeType: string | null;
+  tamanho: number | null;
+};
+
+export const ANEXO_TAMANHO_MAX = 10 * 1024 * 1024; // 10 MB
+const BUCKET_COMPROVANTES = 'comprovantes';
+
+/**
+ * Sobe o comprovante para o bucket privado e devolve o caminho salvo em
+ * `solicitacoes.anexo_url`. Retorna `undefined` se o upload falhar, para que a
+ * solicitacao nao seja criada dando a impressao de que o documento foi junto.
+ */
+async function uploadAnexo(anexo: AnexoLocal): Promise<string | undefined> {
+  const { data: auth } = await supabase.auth.getUser();
+  const uid = auth.user?.id;
+  if (!uid) return undefined;
+
+  try {
+    const resp = await fetch(anexo.uri);
+    const bytes = await resp.arrayBuffer();
+    const ext = anexo.nome.includes('.') ? anexo.nome.split('.').pop() : 'bin';
+    const caminho = `${uid}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage
+      .from(BUCKET_COMPROVANTES)
+      .upload(caminho, bytes, { contentType: anexo.mimeType ?? 'application/octet-stream' });
+    if (error) return undefined;
+    return caminho;
+  } catch {
+    return undefined;
+  }
+}
 
 export async function addSolicitacao(input: NovaSolicitacaoInput): Promise<Solicitacao | null> {
   const d = input.dataRef;
   const dataRef = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  // Sobe o comprovante ANTES de inserir: se o upload falhar, abortamos em vez de
+  // registrar uma justificativa sem o documento que o trabalhador anexou.
+  let anexoUrl: string | null = null;
+  if (input.anexo) {
+    const caminho = await uploadAnexo(input.anexo);
+    if (!caminho) return null;
+    anexoUrl = caminho;
+  }
+
   const { data, error } = await supabase
     .from('solicitacoes')
     .insert({
@@ -90,6 +138,7 @@ export async function addSolicitacao(input: NovaSolicitacaoInput): Promise<Solic
       motivo: input.motivo ?? null,
       periodo: input.periodo ?? null,
       observacao: input.observacao ?? null,
+      anexo_url: anexoUrl,
     })
     .select('id, tipo, status, data_ref, horario, motivo, criado_em')
     .single();

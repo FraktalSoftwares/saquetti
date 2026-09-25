@@ -15,6 +15,8 @@ export type Colaborador = {
   matricula: string | null;
   cargo: string | null;
   departamento: string | null;
+  /** Caminho do arquivo no bucket privado `avatares` (não é URL pública). */
+  fotoPerfil: string | null;
 };
 
 // ----- Registro de Ponto (3.x) -----
@@ -58,6 +60,9 @@ export type Marcacao = {
   unidade: string;
 };
 
+/** Situação do dia, usada no filtro da Home. Folgas ficam fora da lista. */
+export type StatusRegistro = 'completo' | 'incompleto' | 'falta';
+
 export type RegistroDia = {
   id: string;
   /** Ex.: "Sexta, 06 de junho" */
@@ -65,6 +70,7 @@ export type RegistroDia = {
   totalMarcacoes: number;
   /** Ex.: "8h47" */
   trabalhado: string;
+  status: StatusRegistro;
   marcacoes: Marcacao[];
 };
 
@@ -148,8 +154,11 @@ export type MesCartao = {
   periodo: string; // "01 – 30 jun"
   status: 'pendente' | 'assinado';
   trabalhadas: string;
+  esperadas: string; // carga esperada do periodo ("184h00")
   saldo: string;
   saldoPositivo: boolean;
+  /** Dias uteis do periodo sem registro ou com marcacoes em aberto. */
+  inconsistencias: number;
   alerta?: string;
 };
 
