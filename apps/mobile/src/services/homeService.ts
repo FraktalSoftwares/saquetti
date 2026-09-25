@@ -2,13 +2,20 @@ import { supabase } from '../lib/supabase';
 import { minutosTrabalhados, JORNADA_PADRAO_MIN, type Batida } from '../lib/jornada';
 import { dataLonga, diaLocalISO, horaDeISO } from '../utils/datetime';
 import { getEspelho } from './espelhoService';
-import type { ResumoHome } from '../types';
+import type { BadgeTone, ResumoHome, StatusRegistro } from '../types';
 
 /**
  * Resumo da Home (RF-004/005/006) sobre dados reais:
  *  - Jornada de hoje: calculada das marcações de hoje.
  *  - Registro de ponto: dias trabalhados recentes (do espelho do mês).
  */
+
+/** Traduz o badge do espelho para a situação usada no filtro da Home. */
+function statusDoDia(tone: BadgeTone): StatusRegistro {
+  if (tone === 'falta') return 'falta';
+  if (tone === 'pendente') return 'incompleto';
+  return 'completo'; // 'ok' e 'extra': jornada fechada, com ou sem horas extras
+}
 
 const JANELA = '08:00 – 17:00'; // [A DEFINIR: virá da Escala]
 
@@ -39,14 +46,17 @@ export async function getResumoHome(nomeColaborador: string): Promise<ResumoHome
   const trabalhado = minutosTrabalhados(batidas).min;
   const progresso = Math.min(1, trabalhado / JORNADA_PADRAO_MIN);
 
+  // Folgas ficam de fora (não há jornada a mostrar); faltas entram, senão o
+  // filtro por situação nunca teria o que exibir.
   const registros = espelho.dias
-    .filter((d) => d.tipo === 'normal')
-    .slice(0, 5)
+    .filter((d) => d.tipo !== 'folga')
+    .slice(0, 10)
     .map((d) => ({
       id: d.id,
       rotulo: (d.dataExtenso ?? d.id).replace('-feira', ''),
       totalMarcacoes: d.marcacoes.length,
       trabalhado: d.hours ?? '—',
+      status: statusDoDia(d.badge.tone),
       marcacoes: d.marcacoes.map((m, i) => ({ ordem: i + 1, hora: m.hora ?? '--:--', unidade: m.local })),
     }));
 

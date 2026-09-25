@@ -17,8 +17,17 @@ import { colors, radius, spacing, typography } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { getResumoHome } from '../../services/homeService';
 import { getAlertas } from '../../services/alertsService';
-import type { Alerta, RegistroDia, ResumoHome } from '../../types';
+import type { Alerta, RegistroDia, ResumoHome, StatusRegistro } from '../../types';
+
 import type { HomeStackScreenProps } from '../../navigation/types';
+
+/** Situações que o trabalhador pode isolar na lista da Home. */
+const FILTROS: { valor: StatusRegistro | null; rotulo: string }[] = [
+  { valor: null, rotulo: 'Todos' },
+  { valor: 'completo', rotulo: 'Completo' },
+  { valor: 'incompleto', rotulo: 'Incompleto' },
+  { valor: 'falta', rotulo: 'Falta' },
+];
 
 const QUICK_ACTIONS: { key: string; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { key: 'pontos', label: 'Pontos', icon: 'finger-print-outline' },
@@ -33,6 +42,14 @@ export function HomeScreen({ navigation }: HomeStackScreenProps<'HomeMain'>) {
   const [resumo, setResumo] = useState<ResumoHome | null>(null);
   const [alertas, setAlertas] = useState<Alerta[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Filtro por situação do dia. `null` = todos.
+  const [filtroAberto, setFiltroAberto] = useState(false);
+  const [filtro, setFiltro] = useState<StatusRegistro | null>(null);
+  const filtroAtivo = filtro !== null;
+  const registrosFiltrados = (resumo?.registros ?? []).filter(
+    (d) => filtro === null || d.status === filtro,
+  );
   const ativoRef = useRef(true);
 
   const carregar = useCallback(async () => {
@@ -153,15 +170,55 @@ export function HomeScreen({ navigation }: HomeStackScreenProps<'HomeMain'>) {
           {/* Registro de ponto */}
           <View style={styles.sectionHeader}>
             <Text style={styles.registroTitle}>Registro de ponto</Text>
-            <Pressable style={styles.filtrar} hitSlop={8} accessibilityRole="button">
-              <Ionicons name="options-outline" size={18} color={colors.textSecondary} />
-              <Text style={styles.filtrarText}>Filtrar</Text>
+            <Pressable
+              style={styles.filtrar}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityState={{ expanded: filtroAberto }}
+              onPress={() => setFiltroAberto((v) => !v)}
+            >
+              <Ionicons
+                name="options-outline"
+                size={18}
+                color={filtroAtivo ? colors.primary : colors.textSecondary}
+              />
+              <Text style={[styles.filtrarText, filtroAtivo && styles.filtrarTextAtivo]}>
+                {filtroAtivo ? FILTROS.find((f) => f.valor === filtro)?.rotulo : 'Filtrar'}
+              </Text>
             </Pressable>
           </View>
 
-          {resumo?.registros.map((dia) => (
+          {filtroAberto && (
+            <View style={styles.chips}>
+              {FILTROS.map((f) => {
+                const ativo = f.valor === filtro;
+                return (
+                  <Pressable
+                    key={f.valor ?? 'todos'}
+                    style={[styles.chip, ativo && styles.chipAtivo]}
+                    onPress={() => setFiltro(f.valor)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: ativo }}
+                  >
+                    <Text style={[styles.chipText, ativo && styles.chipTextAtivo]}>{f.rotulo}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
+
+          {registrosFiltrados.map((dia) => (
             <DiaCard key={dia.id} dia={dia} />
           ))}
+
+          {resumo && registrosFiltrados.length === 0 && (
+            <View style={styles.vazio}>
+              <Ionicons name="calendar-outline" size={24} color={colors.textMuted} />
+              <Text style={styles.vazioText}>
+                {filtroAtivo ? 'Nenhum dia nesta situação.' : 'Nenhum registro por enquanto.'}
+              </Text>
+            </View>
+          )}
         </ScrollView>
       )}
     </View>
@@ -347,6 +404,23 @@ const styles = StyleSheet.create({
   registroTitle: { ...typography.h2, color: colors.textPrimary },
   filtrar: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   filtrarText: { ...typography.bodyMedium, color: colors.textSecondary },
+  filtrarTextAtivo: { color: colors.primary, fontWeight: '600' },
+
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: spacing.md },
+  chip: {
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  chipAtivo: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipText: { ...typography.caption, fontSize: 13, color: colors.textSecondary },
+  chipTextAtivo: { color: colors.white, fontWeight: '600' },
+
+  vazio: { alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.xl },
+  vazioText: { ...typography.body, fontSize: 13.5, color: colors.textMuted },
 
   diaCard: {
     backgroundColor: colors.surface,

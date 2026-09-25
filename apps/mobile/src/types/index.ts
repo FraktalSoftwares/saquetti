@@ -60,6 +60,9 @@ export type Marcacao = {
   unidade: string;
 };
 
+/** Situação do dia, usada no filtro da Home. Folgas ficam fora da lista. */
+export type StatusRegistro = 'completo' | 'incompleto' | 'falta';
+
 export type RegistroDia = {
   id: string;
   /** Ex.: "Sexta, 06 de junho" */
@@ -67,6 +70,7 @@ export type RegistroDia = {
   totalMarcacoes: number;
   /** Ex.: "8h47" */
   trabalhado: string;
+  status: StatusRegistro;
   marcacoes: Marcacao[];
 };
 
